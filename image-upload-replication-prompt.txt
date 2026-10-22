@@ -1,0 +1,1018 @@
+你是一名熟悉 Vue 3、Axios、Express、Multer、PostgreSQL 的全栈开发工程师。
+
+请帮我实现一个“图片上传、按住户 id 和字段命名、保存到服务器硬盘、数据库保存图片路径”的完整功能。
+
+============================================================
+一、项目目标
+============================================================
+
+前端用户可以上传：
+
+1. 业主头像，字段名为 ownerImg
+2. 户型图，字段名为 houseImg
+
+提交时需要完成：
+
+1. 前端获取图片 File 对象
+2. 校验图片类型
+3. 使用 FormData 发送普通字段和图片文件
+4. Express 接收 multipart/form-data
+5. Multer 解析上传文件
+6. 后端识别图片是 jpg、jpeg 还是 png
+7. 根据住户 id 和图片字段生成固定文件名
+8. 将图片保存到服务器硬盘
+9. 同一个住户重新上传同一类型图片时覆盖旧图片
+10. 如果旧图片扩展名不同，也要删除旧扩展名文件
+11. PostgreSQL 只保存图片访问路径字符串
+12. 查询详情时，前端能够正常回显图片
+
+核心命名规则：
+
+{id}-ownerImg.jpg
+{id}-houseImg.jpg
+
+或者：
+
+{id}-ownerImg.png
+{id}-houseImg.png
+
+例如住户 id 为 123：
+
+123-ownerImg.jpg
+123-houseImg.png
+
+同一个住户重新上传头像时，必须覆盖原头像。
+最终每个住户每个图片字段只能对应一个图片文件。
+
+不要使用以下随机文件名作为最终文件名：
+
+ownerImg-时间戳-随机数.png
+houseImg-时间戳-随机数.jpg
+
+最终文件名只能包含：
+
+住户 id、图片字段名、jpg 或 png 扩展名。
+
+============================================================
+二、技术环境
+============================================================
+
+前端：
+
+- Vue 3
+- script setup
+- Axios
+- Pinia
+- Vite
+
+后端：
+
+- Node.js
+- Express
+- Multer
+- PostgreSQL
+- cors
+
+数据库字段：
+
+owner_img VARCHAR(255),
+house_img VARCHAR(255)
+
+数据库不保存 File 对象，也不保存图片二进制，只保存图片访问路径：
+
+/static/uploads/owner/123-ownerImg.jpg
+/static/uploads/house/123-houseImg.png
+
+============================================================
+三、图片目录结构
+============================================================
+
+后端项目目录：
+
+pg-api/
+├── app.js
+├── servce.js
+└── static/
+    └── uploads/
+        ├── owner/
+        └── house/
+
+图片保存规则：
+
+ownerImg -> static/uploads/owner
+houseImg -> static/uploads/house
+
+如果项目存在 app.js 和 servce.js 两个后端启动入口，必须同步修改两个文件，避免实际启动的入口仍然使用旧的上传逻辑。
+
+============================================================
+四、前端图片选择
+============================================================
+
+Vue 模板：
+
+<input
+  ref="ownerImageInput"
+  type="file"
+  accept="image/jpeg,image/png"
+  @change="handleImageChange($event, 'ownerImg')"
+/>
+
+<input
+  ref="houseImageInput"
+  type="file"
+  accept="image/jpeg,image/png"
+  @change="handleImageChange($event, 'houseImg')"
+/>
+
+使用对象保存真实文件：
+
+const selectedFiles = {
+  ownerImg: null,
+  houseImg: null,
+};
+
+说明：
+
+selectedFiles.ownerImg 保存真正的 File 对象。
+selectedFiles.houseImg 保存真正的 File 对象。
+formData.ownerImg 保存页面预览地址。
+formData.houseImg 保存页面预览地址。
+
+实现选择图片：
+
+function handleImageChange(event, field) {
+  const [file] = event.target.files;
+
+  if (!file) {
+    return;
+  }
+
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    window.alert('只允许上传 JPG、JPEG 或 PNG 图片');
+    event.target.value = '';
+    return;
+  }
+
+  const previewUrl = URL.createObjectURL(file);
+
+  selectedFiles[field] = file;
+  formData[field] = previewUrl;
+
+  event.target.value = '';
+}
+
+页面预览：
+
+<img
+  v-if="formData.ownerImg"
+  :src="formData.ownerImg"
+  alt="业主头像"
+/>
+
+<img
+  v-if="formData.houseImg"
+  :src="formData.houseImg"
+  alt="户型图"
+/>
+
+URL.createObjectURL(file) 只能用于浏览器临时预览，不能保存到数据库。
+
+组件卸载时释放临时 URL：
+
+const objectUrls = new Set();
+
+objectUrls.add(previewUrl);
+
+onBeforeUnmount(() => {
+  objectUrls.forEach((url) => {
+    URL.revokeObjectURL(url);
+  });
+});
+
+============================================================
+五、前端使用 FormData 提交
+============================================================
+
+接口方法：
+
+export const updateInfo = (params) => {
+  return api.post('/updateInfo', params);
+};
+
+提交时必须使用 FormData：
+
+async function onSubmit() {
+  const uploadData = new FormData();
+
+  Object.entries(formData).forEach(([field, value]) => {
+    if (
+      field !== 'ownerImg' &&
+      field !== 'houseImg' &&
+      value !== null &&
+      value !== undefined
+    ) {
+      uploadData.append(field, value);
+    }
+  });
+
+  if (selectedFiles.ownerImg) {
+    uploadData.append(
+      'ownerImg',
+      selectedFiles.ownerImg,
+    );
+  }
+
+  if (selectedFiles.houseImg) {
+    uploadData.append(
+      'houseImg',
+      selectedFiles.houseImg,
+    );
+  }
+
+  try {
+    const response = await updateInfo(uploadData);
+    console.log('更新成功:', response);
+  } catch (error) {
+    console.error('更新失败:', error);
+    window.alert(
+      error.response?.data?.message ||
+      '更新失败，请稍后重试',
+    );
+  }
+}
+
+普通字段示例：
+
+id
+ownerName
+idCard
+phoneNum
+ownerSex
+nativePlace
+houseType
+builtArea
+orientation
+propertyType
+houseAddress
+
+图片字段必须严格使用：
+
+ownerImg
+houseImg
+
+字段对应关系：
+
+前端字段 ownerImg -> Multer 字段 ownerImg -> static/uploads/owner -> 数据库字段 owner_img
+前端字段 houseImg -> Multer 字段 houseImg -> static/uploads/house -> 数据库字段 house_img
+
+不要执行：
+
+JSON.stringify(file)
+
+不要把 File 放到 JSON 请求中。
+不要手动设置 Content-Type: multipart/form-data。
+浏览器会自动生成 boundary，Axios 会自动处理。
+
+============================================================
+六、Axios 配置
+============================================================
+
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://127.0.0.1:8090/api/v1',
+  timeout: 3000,
+});
+
+请求和响应错误必须返回：
+
+return Promise.reject(error);
+
+完整响应拦截器：
+
+api.interceptors.response.use(
+  (response) => {
+    if (response.data.code === 200) {
+      return response.data;
+    }
+
+    return response;
+  },
+  (error) => {
+    return Promise.reject(error);
+  },
+);
+
+不能只写：
+
+Promise.reject(error);
+
+否则错误可能不会正常传给组件的 catch。
+
+============================================================
+七、后端准备静态目录
+============================================================
+
+引入：
+
+const express = require('express');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
+
+定义目录：
+
+const staticDirectory = path.join(
+  __dirname,
+  'static',
+);
+
+const uploadDirectories = {
+  ownerImg: path.join(
+    staticDirectory,
+    'uploads',
+    'owner',
+  ),
+  houseImg: path.join(
+    staticDirectory,
+    'uploads',
+    'house',
+  ),
+};
+
+自动创建目录：
+
+Object.values(uploadDirectories).forEach(
+  (directory) => {
+    fs.mkdirSync(directory, {
+      recursive: true,
+    });
+  },
+);
+
+暴露静态资源：
+
+app.use(
+  '/static',
+  express.static(staticDirectory),
+);
+
+服务器上的文件：
+
+static/uploads/owner/123-ownerImg.jpg
+
+浏览器访问地址：
+
+http://127.0.0.1:8090/static/uploads/owner/123-ownerImg.jpg
+
+============================================================
+八、Multer 必须使用 memoryStorage
+============================================================
+
+不要使用带随机文件名的 diskStorage 作为最终存储方式。
+
+使用 memoryStorage：
+
+const uploadImages = multer({
+  storage: multer.memoryStorage(),
+
+  fileFilter: (req, file, callback) => {
+    const allowedTypes = [
+      'image/jpeg',
+      'image/png',
+    ];
+
+    if (!allowedTypes.includes(file.mimetype)) {
+      callback(
+        new Error(
+          '只允许上传 JPG、JPEG 或 PNG 图片',
+        ),
+      );
+      return;
+    }
+
+    callback(null, true);
+  },
+
+  limits: {
+    fileSize: 10 * 1024 * 1024,
+  },
+});
+
+使用 memoryStorage 的原因：
+
+1. 文件先暂存在内存中
+2. 后端拿到 req.body.id
+3. 后端直接按照最终规则写入目标路径
+4. 不会产生 ownerImg-时间戳-随机数这种临时文件
+5. 最终硬盘中只出现固定命名的文件
+
+Multer 解析后的文件对象：
+
+req.files.ownerImg[0]
+req.files.houseImg[0]
+
+文件内容：
+
+file.buffer
+
+原始文件名：
+
+file.originalname
+
+文件 MIME 类型：
+
+file.mimetype
+
+============================================================
+九、识别 JPG、JPEG、PNG
+============================================================
+
+不要只通过原始文件名判断扩展名，优先根据 MIME 类型判断：
+
+function getImageExtension(file) {
+  if (file.mimetype === 'image/jpeg') {
+    return '.jpg';
+  }
+
+  if (file.mimetype === 'image/png') {
+    return '.png';
+  }
+
+  throw new Error(
+    '只允许上传 JPG、JPEG 或 PNG 图片',
+  );
+}
+
+规则：
+
+image/jpeg -> .jpg
+image/png  -> .png
+
+即使原始文件名是：
+
+photo.jpeg
+
+最终也统一保存为：
+
+123-ownerImg.jpg
+
+============================================================
+十、清理住户 id
+============================================================
+
+不要直接把用户输入拼接到文件路径中。
+
+function createSafeId(value) {
+  const safeId = String(value || '')
+    .replace(/[^a-zA-Z0-9_-]/g, '');
+
+  if (!safeId) {
+    throw new Error('住户 id 无效');
+  }
+
+  return safeId;
+}
+
+============================================================
+十一、删除旧图片
+============================================================
+
+这是保证同一住户、同一图片字段只保留一张图片的关键。
+
+如果旧文件是：
+
+123-ownerImg.jpg
+
+新文件是：
+
+avatar.png
+
+上传前必须删除：
+
+123-ownerImg.jpg
+
+然后保存：
+
+123-ownerImg.png
+
+实现：
+
+function removeOldImageFiles(
+  directory,
+  safeId,
+  fieldName,
+) {
+  const prefix = `${safeId}-${fieldName}.`;
+
+  fs.readdirSync(directory)
+    .filter((filename) => {
+      return filename.startsWith(prefix);
+    })
+    .forEach((filename) => {
+      fs.unlinkSync(
+        path.join(directory, filename),
+      );
+    });
+}
+
+删除逻辑必须在写入新图片之前执行。
+
+============================================================
+十二、固定文件名和保存文件
+============================================================
+
+function saveImageFile(file, id) {
+  const safeId = createSafeId(id);
+  const extension = getImageExtension(file);
+  const fieldName = file.fieldname;
+
+  if (
+    fieldName !== 'ownerImg' &&
+    fieldName !== 'houseImg'
+  ) {
+    throw new Error('不支持的图片字段');
+  }
+
+  const targetDirectory =
+    uploadDirectories[fieldName];
+
+  const filename =
+    `${safeId}-${fieldName}${extension}`;
+
+  const targetPath = path.join(
+    targetDirectory,
+    filename,
+  );
+
+  removeOldImageFiles(
+    targetDirectory,
+    safeId,
+    fieldName,
+  );
+
+  fs.writeFileSync(
+    targetPath,
+    file.buffer,
+  );
+
+  return filename;
+}
+
+固定文件名规则：
+
+{id}-ownerImg.jpg
+{id}-ownerImg.png
+{id}-houseImg.jpg
+{id}-houseImg.png
+
+例如：
+
+123-ownerImg.jpg
+123-houseImg.png
+
+不要添加时间戳、随机数或原始中文文件名。
+
+============================================================
+十三、updateInfo 接口
+============================================================
+
+接口必须使用 Multer 中间件：
+
+app.post(
+  '/api/v1/updateInfo',
+
+  uploadImages.fields([
+    {
+      name: 'ownerImg',
+      maxCount: 1,
+    },
+    {
+      name: 'houseImg',
+      maxCount: 1,
+    },
+  ]),
+
+  async (req, res) => {
+    try {
+      const {
+        id,
+        unitId,
+        floorNum,
+        minHeight,
+        maxHeight,
+        ownerName,
+        idCard,
+        phoneNum,
+        ownerSex,
+        nativePlace,
+        ownerImg,
+        houseType,
+        builtArea,
+        orientation,
+        propertyType,
+        houseImg,
+        houseAddress,
+      } = req.body;
+
+      if (!id) {
+        return res.status(400).json({
+          code: 400,
+          message: '缺少住户 id',
+        });
+      }
+
+      const ownerImage =
+        req.files?.ownerImg?.[0];
+
+      const houseImage =
+        req.files?.houseImg?.[0];
+
+      const ownerImageFilename =
+        ownerImage
+          ? saveImageFile(ownerImage, id)
+          : null;
+
+      const houseImageFilename =
+        houseImage
+          ? saveImageFile(houseImage, id)
+          : null;
+
+      const ownerImagePath =
+        ownerImageFilename
+          ? `/static/uploads/owner/${ownerImageFilename}`
+          : ownerImg || null;
+
+      const houseImagePath =
+        houseImageFilename
+          ? `/static/uploads/house/${houseImageFilename}`
+          : houseImg || null;
+
+      const result = await pool.query(
+        `
+        UPDATE household
+        SET
+          unit_id = $1,
+          floor_num = $2,
+          min_height = $3,
+          max_height = $4,
+          owner_name = $5,
+          id_card = $6,
+          phone_num = $7,
+          owner_sex = $8,
+          native_place = $9,
+          owner_img = $10,
+          house_type = $11,
+          built_area = $12,
+          orientation = $13,
+          property_type = $14,
+          house_img = $15,
+          house_address = $16
+        WHERE id = $17
+        RETURNING
+          id,
+          owner_name AS "ownerName",
+          owner_img AS "ownerImg",
+          house_img AS "houseImg",
+          house_address AS "houseAddress"
+        `,
+        [
+          unitId,
+          floorNum,
+          minHeight,
+          maxHeight,
+          ownerName,
+          idCard,
+          phoneNum,
+          ownerSex,
+          nativePlace,
+          ownerImagePath,
+          houseType,
+          builtArea,
+          orientation,
+          propertyType,
+          houseImagePath,
+          houseAddress,
+          id,
+        ],
+      );
+
+      return res.json({
+        code: 200,
+        message: '更新成功',
+        data: result.rows[0] || null,
+      });
+    } catch (error) {
+      console.error(
+        'updateInfo 失败:',
+        error,
+      );
+
+      return res.status(500).json({
+        code: 500,
+        message: error.message,
+      });
+    }
+  },
+);
+
+============================================================
+十四、未重新选择图片时
+============================================================
+
+如果用户没有选择新图片：
+
+selectedFiles.ownerImg === null
+selectedFiles.houseImg === null
+
+前端提交旧图片路径，后端保留原路径。
+
+前端：
+
+if (selectedFiles.ownerImg) {
+  uploadData.append(
+    'ownerImg',
+    selectedFiles.ownerImg,
+  );
+} else if (formData.ownerImg) {
+  uploadData.append(
+    'ownerImg',
+    getImagePath(formData.ownerImg),
+  );
+}
+
+后端：
+
+const ownerImagePath =
+  ownerImageFilename
+    ? `/static/uploads/owner/${ownerImageFilename}`
+    : ownerImg || null;
+
+同理处理 houseImg。
+
+不要因为用户没有重新上传图片，就把原图片字段更新成 null。
+
+============================================================
+十五、编辑页面图片回显
+============================================================
+
+数据库返回：
+
+{
+  "ownerImg": "/static/uploads/owner/123-ownerImg.jpg",
+  "houseImg": "/static/uploads/house/123-houseImg.png"
+}
+
+前端拼接完整访问地址：
+
+const apiOrigin = 'http://127.0.0.1:8090';
+
+function getImageUrl(imagePath) {
+  if (!imagePath) {
+    return imagePath;
+  }
+
+  if (
+    imagePath.startsWith('http') ||
+    imagePath.startsWith('blob:') ||
+    imagePath.startsWith('data:')
+  ) {
+    return imagePath;
+  }
+
+  return `${apiOrigin}${
+    imagePath.startsWith('/') ? '' : '/'
+  }${imagePath}`;
+}
+
+使用：
+
+formData.ownerImg =
+  getImageUrl(formData.ownerImg);
+
+formData.houseImg =
+  getImageUrl(formData.houseImg);
+
+最终浏览器访问：
+
+http://127.0.0.1:8090/static/uploads/owner/123-ownerImg.jpg
+
+============================================================
+十六、完整数据流
+============================================================
+
+用户选择图片
+    ↓
+浏览器获得 File 对象
+    ↓
+校验 MIME 类型
+    ↓
+生成本地预览 URL
+    ↓
+selectedFiles 保存真实 File
+    ↓
+用户点击提交
+    ↓
+创建 FormData
+    ↓
+添加普通字段
+    ↓
+添加 ownerImg 和 houseImg File
+    ↓
+Axios 发送 multipart/form-data
+    ↓
+Express 接收请求
+    ↓
+Multer memoryStorage 暂存文件
+    ↓
+检查 req.body.id
+    ↓
+检查文件字段名
+    ↓
+根据 MIME 类型识别 jpg/png
+    ↓
+生成固定文件名
+    ↓
+删除同 id 同字段的旧扩展名文件
+    ↓
+直接写入最终文件
+    ↓
+生成 /static/uploads/... 路径
+    ↓
+数据库保存路径字符串
+    ↓
+接口返回更新后的数据
+    ↓
+前端拼接完整 URL
+    ↓
+img 标签显示图片
+
+============================================================
+十七、测试场景
+============================================================
+
+场景一：首次上传 JPG
+
+输入：
+
+id = 123
+ownerImg = avatar.jpg
+
+预期：
+
+static/uploads/owner/123-ownerImg.jpg
+
+数据库：
+
+/static/uploads/owner/123-ownerImg.jpg
+
+场景二：同一用户重新上传 PNG
+
+原文件：
+
+123-ownerImg.jpg
+
+新文件：
+
+avatar.png
+
+预期：
+
+删除 123-ownerImg.jpg
+保存 123-ownerImg.png
+
+目录中不能同时存在：
+
+123-ownerImg.jpg
+123-ownerImg.png
+
+场景三：重新上传 JPG
+
+预期：
+
+覆盖 123-ownerImg.jpg
+最终仍然只有一个 ownerImg 文件。
+
+场景四：同时上传头像和户型图
+
+预期：
+
+123-ownerImg.jpg
+123-houseImg.png
+
+两张图片分别保存在不同目录。
+
+场景五：只修改普通字段
+
+预期：
+
+不上传新图片。
+保留数据库中旧图片路径。
+不删除旧图片。
+
+场景六：不同住户上传图片
+
+住户 123：
+
+123-ownerImg.jpg
+
+住户 124：
+
+124-ownerImg.jpg
+
+两张图片不能互相覆盖。
+
+============================================================
+十八、必须同步修改所有后端入口
+============================================================
+
+如果项目中存在 app.js 和 servce.js，必须确保它们使用完全相同的：
+
+1. Multer 配置
+2. memoryStorage
+3. 图片类型判断
+4. JPG/JPEG/PNG 扩展名转换
+5. 固定文件名规则
+6. 旧图片删除逻辑
+7. 静态目录配置
+8. updateInfo 接口逻辑
+
+启动服务前确认实际使用的入口：
+
+node app.js
+
+或者：
+
+node servce.js
+
+修改代码后必须重启 Node.js 服务。
+
+如果实际启动的是旧进程，代码修改不会生效。
+
+============================================================
+十九、必须执行的验证命令
+============================================================
+
+后端：
+
+node --check app.js
+node --check servce.js
+
+前端：
+
+npm run build
+
+还要检查：
+
+1. 实际运行的是哪个后端入口
+2. 是否重启了 Node.js 服务
+3. 上传目录是否存在
+4. 图片最终文件名是否为 {id}-{field}.jpg 或 {id}-{field}.png
+5. 是否仍然生成 ownerImg-时间戳-随机数的新文件
+6. 同一用户重新上传是否覆盖旧文件
+7. jpg 改 png 后旧 jpg 是否被删除
+8. 数据库保存的是否是 /static/uploads/... 路径
+9. 浏览器是否可以直接访问静态图片 URL
+10. 编辑页面是否能够正常回显图片
+11. 不同住户的同类图片是否不会互相覆盖
+12. 未选择新图片时旧图片是否仍然保留
+
+============================================================
+二十、完成后输出内容
+============================================================
+
+实现完成后，请说明：
+
+1. 修改了哪些文件
+2. 最终文件名规则是什么
+3. JPG、JPEG、PNG 如何识别
+4. 为什么使用 memoryStorage
+5. 旧图片如何删除
+6. 同一个住户重新上传时如何覆盖
+7. 数据库保存什么内容
+8. 静态图片如何访问
+9. 编辑页面如何回显
+10. 如何保证同一住户每种图片只有一个文件
+11. 使用了哪个后端启动入口
+12. 执行了哪些验证命令
+13. 是否存在旧的随机命名文件需要手动清理
+
+最终必须满足：
+
+前端上传 File；
+FormData 负责传输；
+Multer 负责接收；
+memoryStorage 暂存文件；
+后端按照 id 和字段名固定命名；
+JPG/JPEG 统一保存为 .jpg；
+PNG 保存为 .png；
+同一住户同一字段删除旧文件后覆盖新文件；
+服务器硬盘保存图片；
+数据库只保存 /static/uploads/... 路径；
+Express Static 提供访问；
+Vue img 负责回显。

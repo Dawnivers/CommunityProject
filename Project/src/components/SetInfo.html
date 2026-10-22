@@ -1,0 +1,418 @@
+<!DOCTYPE html><html class="dark" lang="zh-CN" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>编辑房户信息</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;family=Geist:wght@400&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "primary-fixed": "#c4e7ff",
+                        "on-surface-variant": "#bdc8d1",
+                        "on-primary-fixed-variant": "#004c69",
+                        "secondary": "#a5c8ff",
+                        "primary-container": "#38bdf8",
+                        "on-primary": "#00354a",
+                        "outline": "#87929a",
+                        "surface-bright": "#343a3e",
+                        "surface-container-high": "#252b2e",
+                        "surface-container-highest": "#303539",
+                        "secondary-fixed": "#d4e3ff",
+                        "on-tertiary": "#472a00",
+                        "background": "#0f1418",
+                        "on-error": "#690005",
+                        "inverse-surface": "#dee3e8",
+                        "on-tertiary-fixed": "#2a1700",
+                        "tertiary-fixed-dim": "#ffb960",
+                        "inverse-on-surface": "#2c3135",
+                        "surface-container-low": "#171c20",
+                        "primary": "#8ed5ff",
+                        "on-background": "#dee3e8",
+                        "secondary-fixed-dim": "#a5c8ff",
+                        "tertiary-fixed": "#ffddb8",
+                        "surface-dim": "#0f1418",
+                        "surface-container-lowest": "#0a0f12",
+                        "surface-tint": "#7bd0ff",
+                        "outline-variant": "#3e484f",
+                        "tertiary-container": "#f1a02b",
+                        "on-secondary-container": "#002a53",
+                        "on-primary-container": "#004965",
+                        "on-secondary": "#00315e",
+                        "primary-fixed-dim": "#7bd0ff",
+                        "on-secondary-fixed": "#001c3a",
+                        "on-tertiary-container": "#613b00",
+                        "surface": "#0f1418",
+                        "tertiary": "#ffc176",
+                        "inverse-primary": "#00668a",
+                        "error-container": "#93000a",
+                        "on-secondary-fixed-variant": "#004785",
+                        "on-primary-fixed": "#001e2c",
+                        "on-surface": "#dee3e8",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "surface-variant": "#303539",
+                        "error": "#ffb4ab",
+                        "surface-container": "#1b2024",
+                        "on-error-container": "#ffdad6",
+                        "secondary-container": "#2492ff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "xs": "4px",
+                        "xl": "48px",
+                        "md": "16px",
+                        "margin-mobile": "16px",
+                        "unit": "4px",
+                        "gutter": "16px",
+                        "sm": "8px",
+                        "lg": "24px",
+                        "margin-desktop": "32px"
+                    },
+                    "fontFamily": {
+                        "body-base": ["Geist"],
+                        "headline-md": ["Sora"],
+                        "code-label": ["JetBrains Mono"],
+                        "headline-md-mobile": ["Sora"],
+                        "display-lg": ["Sora"]
+                    },
+                    "fontSize": {
+                        "body-base": ["16px", { "lineHeight": "1.6", "fontWeight": "400" }],
+                        "headline-md": ["24px", { "lineHeight": "1.3", "fontWeight": "600" }],
+                        "code-label": ["12px", { "lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500" }],
+                        "headline-md-mobile": ["20px", { "lineHeight": "1.2", "fontWeight": "600" }],
+                        "display-lg": ["48px", { "lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    },
+                    "backgroundImage": {
+                        "tech-gradient": "linear-gradient(to bottom, var(--tw-colors-primary-container), var(--tw-colors-secondary-container))"
+                    },
+                    "boxShadow": {
+                        "glow": "0 0 10px rgba(56, 189, 248, 0.5)",
+                        "panel": "0px 8px 24px rgba(0, 0, 0, 0.5)"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body {
+            background-color: #060B1A;
+            color: var(--tw-colors-on-surface);
+        }
+        .bg-layer-1 {
+            background-color: rgba(6, 11, 26, 0.8);
+            border: 1px solid var(--tw-colors-outline-variant);
+        }
+        .bg-layer-2 {
+            background-color: rgba(6, 11, 26, 1);
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--tw-colors-outline-variant);
+        }
+        .glass-header {
+            background-color: rgba(6, 11, 26, 0.5);
+            backdrop-filter: blur(12px);
+            background-image: linear-gradient(rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.1));
+        }
+        .tech-button {
+            background: linear-gradient(180deg, var(--tw-colors-primary-container) 0%, var(--tw-colors-secondary-container) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.2s ease-in-out;
+        }
+        .tech-button:hover {
+            box-shadow: 0 0 10px var(--tw-colors-primary-container);
+        }
+        .tech-input {
+            background-color: var(--tw-colors-surface-container-high);
+            border: 1px solid var(--tw-colors-outline-variant);
+            transition: all 0.2s;
+        }
+        .tech-input:focus {
+            border-color: var(--tw-colors-primary);
+            outline: none;
+            box-shadow: -2px 0 0 0 var(--tw-colors-primary);
+        }
+        .pill {
+            background-color: rgba(142, 213, 255, 0.1);
+            border: 1px solid var(--tw-colors-primary);
+            color: var(--tw-colors-primary);
+        }
+        
+        /* Custom scrollbar for table body if it scrolls */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--tw-colors-surface-container-low);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--tw-colors-outline-variant);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--tw-colors-outline);
+        }
+    </style>
+</head>
+<body class="min-h-screen h-auto font-body-base text-body-base antialiased flex flex-col relative overflow-x-hidden" style="background-color: rgb(15, 20, 24);">
+<!-- Ambient Background Reference Image -->
+<!-- SideNavBar (Suppressed based on logic: Page is a specific operational task "编辑房户信息" likely opened from a management console, treating it as a focused view. However, it looks like a main management screen. Let's include it but collapsed or minimal for a focused view, or keep it standard. The rules say: hide if Linear/Transactional or Task-Focused with Close/Back. The title implies editing, a task-focused action. I will suppress the SideNav and TopNav to focus on the canvas, or use the TopAppBar as instructed in JSON.) -->
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-background/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm flex justify-between items-center px-[2vw] md:px-[4vw] h-16 w-full">
+<div class="flex items-center gap-[1rem]">
+<!-- Back button for task context -->
+<button class="text-on-surface-variant hover:text-primary transition-colors active:scale-95 duration-150 flex items-center justify-center">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-primary tracking-tight">编辑房户信息</h1>
+</div>
+<!-- Trailing Action / Dropdown -->
+<div class="relative group">
+<button class="flex items-center gap-[0.25rem] px-[1rem] py-[0.5rem] bg-surface-container-high border border-outline-variant rounded hover:bg-surface-container-highest/50 transition-colors active:scale-95 duration-150">
+<span class="font-code-label text-code-label text-on-surface">选择楼栋</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_drop_down</span>
+</button>
+<!-- Dropdown Menu (hidden by default, shown on hover for demo) -->
+<div class="absolute right-0 mt-xs w-48 bg-layer-2 rounded border border-outline-variant opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+<ul class="py-xs font-code-label text-code-label text-on-surface">
+<li class="px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer border-l-2 border-transparent hover:border-primary">A栋 (Alpha)</li>
+<li class="px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer border-l-2 border-transparent hover:border-primary">B栋 (Beta)</li>
+<li class="px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer border-l-2 border-transparent hover:border-primary">C栋 (Gamma)</li>
+</ul>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 pt-[80px] pb-[3rem] px-[2vw] md:px-[4vw] max-w-[1440px] mx-auto w-full flex flex-col gap-[1.5rem]">
+<!-- Data Table Container -->
+<div class="bg-layer-1 rounded-lg flex flex-col overflow-hidden w-full">
+<div class="overflow-x-auto w-full">
+<table class="w-full text-left border-collapse table-auto">
+<thead class="glass-header border-b border-outline-variant/30 w-full">
+<tr class="w-full">
+<th class="py-[1rem] px-[2%] w-[20%] font-code-label text-code-label text-on-surface uppercase tracking-widest border-r border-outline-variant/10 last:border-r-0">门牌号</th>
+<th class="py-[1rem] px-[2%] w-[20%] font-code-label text-code-label text-on-surface uppercase tracking-widest border-r border-outline-variant/10 last:border-r-0">单元号</th>
+<th class="py-[1rem] px-[2%] w-[20%] font-code-label text-code-label text-on-surface uppercase tracking-widest border-r border-outline-variant/10 last:border-r-0">楼层</th>
+<th class="py-[1rem] px-[2%] w-[20%] font-code-label text-code-label text-on-surface uppercase tracking-widest border-r border-outline-variant/10 last:border-r-0">操作</th>
+<th class="py-[1rem] px-[2%] w-[20%] font-code-label text-code-label text-on-surface uppercase tracking-widest">定位</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20 w-full" id="table-body">
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">101</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-A</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">102</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-B</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">103</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-A</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">104</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-B</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">105</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-A</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">106</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-B</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">107</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-A</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">108</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-B</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">109</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-A</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary/10 text-primary border border-primary/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">110</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-primary-container/10 text-primary-container border border-primary-container/30 shadow-[0_0_10px_rgba(56,189,248,0.5)]">Unit-B</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label bg-tertiary/10 text-tertiary border border-tertiary/30 shadow-[0_0_10px_rgba(255,193,118,0.5)]">F1</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr></tbody>
+</table>
+</div>
+<!-- Pagination Footer -->
+<div class="flex items-center px-[2vw] py-[1rem] border-t border-outline-variant/30 bg-surface-container-low/50 justify-end gap-[1rem] w-full flex-wrap">
+<!-- Page Numbers -->
+<div class="flex items-center gap-[0.5rem] font-code-label text-code-label flex-wrap" id="pagination-numbers"><button class="w-8 h-8 flex items-center justify-center rounded border border-outline-variant text-on-surface-variant opacity-50 cursor-not-allowed" disabled=""><span class="material-symbols-outlined text-[16px]">chevron_left</span></button><button class="w-8 h-8 flex items-center justify-center rounded border border-primary bg-primary/20 text-primary shadow-[0_0_10px_rgba(56,189,248,0.3)] transition-colors">1</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">2</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">3</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">4</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">5</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors">6</button><button class="w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors"><span class="material-symbols-outlined text-[16px]">chevron_right</span></button></div>
+<!-- Right Dropdown -->
+<div class="relative group">
+<button class="flex items-center gap-[0.25rem] px-[1rem] py-[0.5rem] bg-surface-container border border-outline-variant rounded font-code-label text-code-label text-on-surface hover:border-primary transition-colors">
+<span class="" id="page-info-text">6页/page</span>
+<span class="material-symbols-outlined text-[16px] text-on-surface-variant">arrow_drop_down</span>
+</button>
+<!-- Page Select Dropdown -->
+<div class="absolute bottom-full right-0 mb-xs w-32 bg-layer-2 rounded border border-outline-variant opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+<ul class="py-xs font-code-label text-code-label text-on-surface max-h-48 overflow-y-auto">
+<li class="page-size-option px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer flex justify-between items-center text-primary bg-primary/10" data-size="10" onclick="changePageSize(10)">10 / page <span class="material-symbols-outlined text-[14px]">check</span></li>
+<li class="page-size-option px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer flex justify-between items-center" data-size="20" onclick="changePageSize(20)">20 / page</li>
+<li class="page-size-option px-[1rem] py-[0.5rem] hover:bg-surface-container-highest cursor-pointer flex justify-between items-center" data-size="50" onclick="changePageSize(50)">50 / page</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+</main>
+<script>
+    // Generate dummy dataset (e.g. 56 items to show 6 pages of 10)
+    const dummyData = Array.from({length: 56}, (_, i) => ({
+        room: `${Math.floor(i/10)+1}${String((i%10)+1).padStart(2, '0')}`,
+        unit: `Unit-${i%2===0?'A':'B'}`,
+        floor: `F${Math.floor(i/10)+1}`
+    }));
+
+    let currentPage = 1;
+    let rowsPerPage = 10;
+
+    function renderTable() {
+        const tbody = document.getElementById('table-body');
+        tbody.innerHTML = '';
+        const start = (currentPage - 1) * rowsPerPage;
+        const end = start + rowsPerPage;
+        const pageData = dummyData.slice(start, end);
+
+        pageData.forEach(item => {
+            tbody.innerHTML += `
+            <tr class="hover:bg-surface-container-highest/30 transition-colors group w-full">
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label pill text-primary-container" style="text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);">${item.room}</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label pill text-primary-container" style="text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);">${item.unit}</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><span class="inline-flex items-center px-[0.5rem] py-[2px] rounded-full font-code-label text-code-label pill text-primary-container" style="text-shadow: 0 0 8px rgba(56, 189, 248, 0.6);">${item.floor}</span></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-primary hover:text-primary-container font-code-label text-code-label transition-colors flex items-center gap-[0.25rem]"><span class="material-symbols-outlined text-[16px]">edit_square</span> 编辑信息</button></td>
+                <td class="py-[1rem] px-[2%] w-[20%]"><button class="text-on-surface-variant group-hover:text-tertiary-container transition-colors"><span class="material-symbols-outlined" data-weight="fill">location_on</span></button></td>
+            </tr>`;
+        });
+    }
+
+    function renderPagination() {
+        const totalPages = Math.ceil(dummyData.length / rowsPerPage);
+        document.getElementById('page-info-text').innerText = `${totalPages}页/page`;
+        
+        const pageNumContainer = document.getElementById('pagination-numbers');
+        pageNumContainer.innerHTML = '';
+
+        // Prev Button
+        const prevBtn = document.createElement('button');
+        prevBtn.className = `w-8 h-8 flex items-center justify-center rounded border ${currentPage === 1 ? 'border-outline-variant text-on-surface-variant opacity-50 cursor-not-allowed' : 'border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors'}`;
+        prevBtn.disabled = currentPage === 1;
+        prevBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">chevron_left</span>';
+        prevBtn.onclick = () => { if (currentPage > 1) { currentPage--; updateView(); } };
+        pageNumContainer.appendChild(prevBtn);
+
+        // Calculate pages to show
+        let pagesToShow = [];
+        if (totalPages <= 6) {
+            for (let i = 1; i <= totalPages; i++) pagesToShow.push(i);
+        } else {
+            if (currentPage <= 3) pagesToShow = [1, 2, 3, 4, '...', totalPages];
+            else if (currentPage >= totalPages - 2) pagesToShow = [1, '...', totalPages - 3, totalPages - 2, totalPages - 1, totalPages];
+            else pagesToShow = [1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages];
+        }
+
+        // Render page buttons
+        pagesToShow.forEach(p => {
+            if (p === '...') {
+                const span = document.createElement('span');
+                span.className = 'text-on-surface-variant px-[0.25rem]';
+                span.innerText = '...';
+                pageNumContainer.appendChild(span);
+            } else {
+                const btn = document.createElement('button');
+                if (p === currentPage) {
+                    btn.className = 'w-8 h-8 flex items-center justify-center rounded border border-primary bg-primary/20 text-primary shadow-[0_0_10px_rgba(56,189,248,0.3)] transition-colors';
+                } else {
+                    btn.className = 'w-8 h-8 flex items-center justify-center rounded border border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors';
+                }
+                btn.innerText = p;
+                btn.onclick = () => { currentPage = p; updateView(); };
+                pageNumContainer.appendChild(btn);
+            }
+        });
+
+        // Next Button
+        const nextBtn = document.createElement('button');
+        nextBtn.className = `w-8 h-8 flex items-center justify-center rounded border ${currentPage === totalPages ? 'border-outline-variant text-on-surface-variant opacity-50 cursor-not-allowed' : 'border-transparent hover:border-outline-variant text-on-surface hover:bg-surface-container-high transition-colors'}`;
+        nextBtn.disabled = currentPage === totalPages;
+        nextBtn.innerHTML = '<span class="material-symbols-outlined text-[16px]">chevron_right</span>';
+        nextBtn.onclick = () => { if (currentPage < totalPages) { currentPage++; updateView(); } };
+        pageNumContainer.appendChild(nextBtn);
+    }
+
+    function updateView() {
+        renderTable();
+        renderPagination();
+    }
+
+    function changePageSize(size) {
+        rowsPerPage = size;
+        currentPage = 1;
+        updateView();
+        
+        // Update styling of dropdown options
+        document.querySelectorAll('.page-size-option').forEach(el => {
+            const isSelected = el.dataset.size == size;
+            el.innerHTML = `${el.dataset.size} / page ${isSelected ? '<span class="material-symbols-outlined text-[14px]">check</span>' : ''}`;
+            if(isSelected) {
+                el.classList.add('text-primary', 'bg-primary/10');
+            } else {
+                el.classList.remove('text-primary', 'bg-primary/10');
+            }
+        });
+    }
+
+    // Initial render
+    document.addEventListener('DOMContentLoaded', updateView);
+</script>
+
+
+
+
+
+
+</body></html>

@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>编辑业主信息 - 智慧物业管理系统</title>
+<!-- BEGIN: Custom Dark Cyberpunk & Sci-Fi Property Management Theme Styles -->
+<style data-purpose="base-layout">
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: #060911;
+      background-image: 
+        radial-gradient(circle at 15% 15%, rgba(14, 116, 144, 0.18) 0%, transparent 45%),
+        radial-gradient(circle at 85% 85%, rgba(3, 105, 161, 0.15) 0%, transparent 45%),
+        linear-gradient(rgba(15, 23, 42, 0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(15, 23, 42, 0.5) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+      color: #e2e8f0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+    }
+
+    /* Modal Main Container */
+    .sci-modal-container {
+      width: 100%;
+      max-width: 900px;
+      background: rgba(10, 17, 30, 0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 12px;
+      box-shadow: 0 0 35px rgba(8, 145, 178, 0.22), 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      position: relative;
+    }
+
+    /* Sci-Fi Ambient Corner Highlights */
+    .sci-modal-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent 0%, #38bdf8 30%, #00f0ff 70%, transparent 100%);
+    }
+
+    .sci-modal-container::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+    }
+  </style>
+<style data-purpose="components-layout">
+    /* Header Styles */
+    .panel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 28px;
+      border-bottom: 1px solid rgba(56, 189, 248, 0.18);
+      background: rgba(15, 23, 42, 0.45);
+    }
+
+    .header-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .panel-title {
+      font-size: 19px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      color: #f8fafc;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.4);
+    }
+
+    /* Body & Form Content */
+    .panel-body {
+      padding: 24px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* Section Cards */
+    .info-card {
+      background: rgba(15, 23, 42, 0.55);
+      border: 1px solid rgba(56, 189, 248, 0.18);
+      border-radius: 8px;
+      padding: 18px 22px;
+      position: relative;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: #38bdf8;
+      margin-bottom: 18px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .section-title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 14px;
+      background: linear-gradient(180deg, #00f0ff, #0284c7);
+      border-radius: 2px;
+      box-shadow: 0 0 8px #00f0ff;
+    }
+
+    /* Form Grids */
+    .form-grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 24px;
+      margin-bottom: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .form-group.full-width {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      font-size: 13px;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .required-marker {
+      color: #f43f5e;
+      margin-right: 2px;
+    }
+
+    /* Form Controls */
+    .input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .sci-input {
+      width: 100%;
+      height: 40px;
+      background: rgba(10, 15, 24, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 6px;
+      padding: 0 14px;
+      color: #f1f5f9;
+      font-size: 13.5px;
+      outline: none;
+      transition: all 0.25s ease;
+    }
+
+    .sci-input::placeholder {
+      color: #475569;
+    }
+
+    .sci-input:focus {
+      border-color: #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+      background: rgba(13, 22, 38, 0.95);
+    }
+
+    .sci-input:disabled,
+    .sci-input[readonly] {
+      background: rgba(15, 23, 42, 0.5);
+      border-color: rgba(71, 85, 105, 0.3);
+      color: #64748b;
+      cursor: not-allowed;
+    }
+
+    .input-suffix {
+      position: absolute;
+      right: 14px;
+      color: #64748b;
+      font-size: 13px;
+      pointer-events: none;
+    }
+
+    .input-lock-icon {
+      position: absolute;
+      right: 12px;
+      color: #64748b;
+      width: 15px;
+      height: 15px;
+      pointer-events: none;
+    }
+
+    /* Custom Sci-Fi Select Component */
+    .custom-select-container {
+      position: relative;
+      width: 100%;
+      user-select: none;
+    }
+
+    .custom-select-trigger {
+      width: 100%;
+      height: 40px;
+      background: rgba(10, 15, 24, 0.85);
+      border: 1px solid rgba(56, 189, 248, 0.28);
+      border-radius: 6px;
+      padding: 0 36px 0 14px;
+      color: #f1f5f9;
+      font-size: 13.5px;
+      outline: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .custom-select-trigger:hover {
+      border-color: rgba(56, 189, 248, 0.5);
+      background: rgba(13, 22, 38, 0.9);
+    }
+
+    .custom-select-container.open .custom-select-trigger {
+      border-color: #00f0ff;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.35);
+      background: rgba(13, 22, 38, 0.95);
+    }
+
+    .select-arrow {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      margin-top: -8px;
+      width: 16px;
+      height: 16px;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      transform-origin: center center;
+      transform: rotate(0deg);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.25s ease, filter 0.25s ease;
+    }
+
+    .custom-select-container.open .select-arrow {
+      transform: rotate(180deg);
+      color: #00f0ff;
+      filter: drop-shadow(0 0 6px rgba(0, 240, 255, 0.85));
+    }
+
+    .custom-select-dropdown {
+      position: absolute;
+      top: calc(100% + 5px);
+      left: 0;
+      right: 0;
+      background: rgba(10, 17, 30, 0.96);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(56, 189, 248, 0.38);
+      border-radius: 6px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 0 15px rgba(8, 145, 178, 0.3);
+      z-index: 50;
+      max-height: 220px;
+      overflow-y: auto;
+      padding: 5px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-8px);
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-select-container.open .custom-select-dropdown {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+
+    .custom-select-option {
+      padding: 8px 12px;
+      color: #cbd5e1;
+      font-size: 13px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.2s ease;
+    }
+
+    .custom-select-option:hover {
+      background: rgba(56, 189, 248, 0.16);
+      color: #00f0ff;
+      text-shadow: 0 0 8px rgba(0, 240, 255, 0.4);
+    }
+
+    .custom-select-option.selected {
+      background: rgba(0, 240, 255, 0.12);
+      color: #00f0ff;
+      font-weight: 500;
+    }
+
+    /* Scrollbar for select dropdown */
+    .custom-select-dropdown::-webkit-scrollbar {
+      width: 5px;
+    }
+    .custom-select-dropdown::-webkit-scrollbar-track {
+      background: rgba(15, 23, 42, 0.4);
+    }
+    .custom-select-dropdown::-webkit-scrollbar-thumb {
+      background: rgba(56, 189, 248, 0.3);
+      border-radius: 3px;
+    }
+    .custom-select-dropdown::-webkit-scrollbar-thumb:hover {
+      background: #00f0ff;
+    }
+
+    /* Media Upload Rows */
+    .media-upload-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-top: 4px;
+    }
+
+    .preview-box {
+      background: rgba(8, 14, 26, 0.85);
+      border: 1px dashed rgba(56, 189, 248, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.25s ease;
+    }
+
+    .preview-box:hover {
+      border-color: #00f0ff;
+      box-shadow: 0 0 10px rgba(0, 240, 255, 0.2);
+    }
+
+    .avatar-preview {
+      width: 76px;
+      height: 76px;
+      border-radius: 8px;
+    }
+
+    .floorplan-preview {
+      width: 120px;
+      height: 76px;
+      border-radius: 6px;
+    }
+
+    .reupload-btn {
+      height: 38px;
+      padding: 0 16px;
+      background: rgba(56, 189, 248, 0.08);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      border-radius: 6px;
+      color: #38bdf8;
+      font-size: 13px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .reupload-btn:hover {
+      background: rgba(56, 189, 248, 0.18);
+      border-color: #00f0ff;
+      color: #00f0ff;
+      box-shadow: 0 0 14px rgba(0, 240, 255, 0.3);
+    }
+
+    /* Modal Footer */
+    .panel-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 16px;
+      padding: 18px 28px;
+      border-top: 1px solid rgba(56, 189, 248, 0.18);
+      background: rgba(15, 23, 42, 0.4);
+    }
+
+    .btn-cancel {
+      height: 40px;
+      padding: 0 22px;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 6px;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-cancel:hover {
+      background: rgba(51, 65, 85, 0.7);
+      border-color: #94a3b8;
+      color: #f1f5f9;
+    }
+
+    .btn-submit {
+      height: 40px;
+      padding: 0 28px;
+      background: linear-gradient(135deg, #0284c7 0%, #00f0ff 100%);
+      border: none;
+      border-radius: 6px;
+      color: #04101e;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.25s ease;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #0369a1 0%, #38bdf8 100%);
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.65);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    @media (max-width: 680px) {
+      .form-grid-2 {
+        grid-template-columns: 1fr;
+      }
+      .panel-body {
+        padding: 16px;
+      }
+      .panel-header, .panel-footer {
+        padding: 16px;
+      }
+    }
+  </style>
+<!-- END: Custom Dark Cyberpunk & Sci-Fi Property Management Theme Styles -->
+</head>
+<body>
+<!-- BEGIN: EditOwnerModal -->
+<main class="sci-modal-container" data-purpose="owner-edit-panel">
+<!-- BEGIN: PanelHeader -->
+<!-- 顶部操作栏与模块标题 -->
+<header class="panel-header">
+<div class="header-title-group">
+<h1 class="panel-title">编辑业主信息</h1>
+</div>
+<button aria-label="关闭" class="" onmouseout="this.style.color='#38bdf8'; this.style.filter='drop-shadow(0 0 6px rgba(56, 189, 248, 0.8))'; this.style.transform='scale(1)';" onmouseover="this.style.color='#00f2fe'; this.style.filter='drop-shadow(0 0 10px rgba(56, 189, 248, 1))'; this.style.transform='scale(1.08)';" style="background: transparent; border-width: medium; border-style: none; border-color: currentcolor; border-image: none; outline: none; width: 34px; height: 34px; display: flex; align-items: center; justify-content: center; cursor: pointer; color: rgb(56, 189, 248); filter: drop-shadow(rgba(56, 189, 248, 0.8) 0px 0px 6px); padding: 0px; transition: 0.25s;" title="关闭" type="button"><svg fill="none" height="18" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24" width="18"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg></button>
+</header>
+<!-- END: PanelHeader -->
+<!-- BEGIN: FormBody -->
+<form class="panel-body" onsubmit="event.preventDefault();">
+<!-- BEGIN: OwnerInfoSection -->
+<!-- 第一模块：业主信息 -->
+<section class="info-card" data-purpose="owner-information-card">
+<div class="section-title">业主信息</div>
+<!-- 姓名与性别 -->
+<div class="form-grid-2">
+<div class="form-group">
+<label class="form-label" for="owner-name">
+<span class=""><span class="required-marker">*</span>业主姓名</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="owner-name" placeholder="请输入业主姓名" required="" type="text" value="张明宇"/>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="owner-gender">
+<span class=""><span class="required-marker">*</span>业主性别</span>
+</label>
+<div class="custom-select-container" id="select-owner-gender">
+<input id="owner-gender" name="owner-gender" type="hidden" value="male"/>
+<div aria-expanded="false" aria-haspopup="listbox" class="custom-select-trigger" role="button" tabindex="0">
+<span class="custom-select-value">男</span>
+<svg class="select-arrow" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</div>
+<div class="custom-select-dropdown" role="listbox">
+<div aria-selected="true" class="custom-select-option selected" data-value="male" role="option">男</div>
+<div aria-selected="false" class="custom-select-option" data-value="female" role="option">女</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 身份证号与手机号码 -->
+<div class="form-grid-2">
+<div class="form-group">
+<label class="form-label" for="owner-id-card">
+<span class=""><span class="required-marker">*</span>身份证号</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="owner-id-card" placeholder="请输入18位身份证号" required="" type="text" value="11010819880520431X"/>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="owner-phone">
+<span class=""><span class="required-marker">*</span>手机号码</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="owner-phone" placeholder="请输入联系手机号" required="" type="tel" value="13812345678"/>
+</div>
+</div>
+</div>
+<!-- 家庭住址（宽幅长输入框） -->
+<div class="form-group full-width">
+<label class="form-label" for="owner-address">
+<span class="">家庭住址</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="owner-address" placeholder="请输入常住家庭住址详细信息" type="text" value="北京市海淀区中关村南大街科技创新园7号院"/>
+</div>
+</div>
+<!-- 业主头像 -->
+<div class="form-group">
+<label class="form-label">
+<span class="">业主头像</span>
+</label>
+<div class="media-upload-row">
+<!-- 占位头像预览 -->
+<div class="preview-box avatar-preview" title="头像预览">
+<svg fill="none" height="42" stroke="rgba(56, 189, 248, 0.6)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="42">
+<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+<circle cx="12" cy="7" r="4"></circle>
+</svg>
+</div>
+<!-- 重新上传按钮 -->
+<button class="reupload-btn" type="button">
+<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="17 8 12 3 7 8"></polyline>
+<line x1="12" x2="12" y1="3" y2="15"></line>
+</svg>
+<span class="">重新上传</span>
+</button>
+</div>
+</div>
+</section>
+<!-- END: OwnerInfoSection -->
+<!-- BEGIN: HouseInfoSection -->
+<!-- 第二模块：房屋信息 -->
+<section class="info-card" data-purpose="house-information-card">
+<div class="section-title">房屋信息</div>
+<!-- 房屋类型与房屋面积 -->
+<div class="form-grid-2">
+<div class="form-group">
+<label class="form-label" for="house-type">
+<span class="">房屋类型</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="house-type" placeholder="例如：三室两厅一卫" type="text" value="三室两厅两卫"/>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="house-area">
+<span class="">房屋面积</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="house-area" placeholder="请输入房屋建筑面积" type="text" value="138.65"/>
+<span class="input-suffix">m²</span>
+</div>
+</div>
+</div>
+<!-- 房屋朝向与物业类型 -->
+<div class="form-grid-2">
+<div class="form-group">
+<label class="form-label" for="house-orientation">
+<span class="">房屋朝向</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" id="house-orientation" placeholder="例如：南向、南北通透" type="text" value="南北通透"/>
+</div>
+</div>
+<div class="form-group">
+<label class="form-label" for="property-type">
+<span class="">物业类型</span>
+</label>
+<div class="custom-select-container" id="select-property-type">
+<input id="property-type" name="property-type" type="hidden" value="residential"/>
+<div aria-expanded="false" aria-haspopup="listbox" class="custom-select-trigger" role="button" tabindex="0">
+<span class="custom-select-value">居民物业</span>
+<svg class="select-arrow" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<polyline points="6 9 12 15 18 9"></polyline>
+</svg>
+</div>
+<div class="custom-select-dropdown" role="listbox">
+<div aria-selected="true" class="custom-select-option selected" data-value="residential" role="option">居民物业</div>
+<div aria-selected="false" class="custom-select-option" data-value="commercial" role="option">商业物业</div>
+<div aria-selected="false" class="custom-select-option" data-value="industrial" role="option">工业物业</div>
+<div aria-selected="false" class="custom-select-option" data-value="other" role="option">其他物业</div>
+</div>
+</div>
+</div>
+</div>
+<!-- 房屋号码 (不可编辑) -->
+<div class="form-group full-width">
+<label class="form-label" for="house-number">
+<span class="">房屋号码 (只读)</span>
+</label>
+<div class="input-wrapper">
+<input class="sci-input" disabled="" id="house-number" readonly="" type="text" value="A区-3号楼-2单元-1602室"/>
+<svg class="input-lock-icon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24">
+<rect height="11" rx="2" ry="2" width="18" x="3" y="11"></rect>
+<path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+</svg>
+</div>
+</div>
+<!-- 户型图 -->
+<div class="form-group">
+<label class="form-label">
+<span class="">户型图</span>
+</label>
+<div class="media-upload-row">
+<!-- 户型图示意占位图 -->
+<div class="preview-box floorplan-preview" title="户型图预览">
+<svg fill="none" height="42" stroke="rgba(56, 189, 248, 0.6)" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.6" viewbox="0 0 24 24" width="42">
+<rect height="18" rx="2" ry="2" width="18" x="3" y="3"></rect>
+<line x1="3" x2="21" y1="9" y2="9"></line>
+<line x1="9" x2="9" y1="21" y2="9"></line>
+<circle cx="15" cy="15" r="2"></circle>
+</svg>
+</div>
+<!-- 重新上传户型图按钮 -->
+<button class="reupload-btn" type="button">
+<svg fill="none" height="15" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewbox="0 0 24 24" width="15">
+<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+<polyline points="17 8 12 3 7 8"></polyline>
+<line x1="12" x2="12" y1="3" y2="15"></line>
+</svg>
+<span class="">重新上传</span>
+</button>
+</div>
+</div>
+</section>
+<!-- END: HouseInfoSection -->
+<!-- BEGIN: PanelFooter -->
+<!-- 底部操作按钮区域 -->
+<footer class="panel-footer">
+<button class="btn-cancel" type="button">取消</button>
+<button class="btn-submit" type="submit">
+<svg fill="none" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24" width="16">
+<polyline points="20 6 9 17 4 12"></polyline>
+</svg>
+<span class="">提交</span>
+</button>
+</footer>
+<!-- END: PanelFooter -->
+</form>
+<!-- END: FormBody -->
+</main>
+<!-- END: EditOwnerModal -->
+<script>
+  // 原生 JavaScript 下拉选择组件交互逻辑
+  document.addEventListener('DOMContentLoaded', function () {
+    const selectContainers = document.querySelectorAll('.custom-select-container');
+
+    function closeAllSelects(except) {
+      selectContainers.forEach(container => {
+        if (container !== except) {
+          container.classList.remove('open');
+          const trigger = container.querySelector('.custom-select-trigger');
+          if (trigger) trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+    }
+
+    selectContainers.forEach(container => {
+      const trigger = container.querySelector('.custom-select-trigger');
+      const hiddenInput = container.querySelector('input[type="hidden"]');
+      const valueDisplay = container.querySelector('.custom-select-value');
+      const options = container.querySelectorAll('.custom-select-option');
+
+      // 点击切换展开/折叠
+      trigger.addEventListener('click', function (e) {
+        e.stopPropagation();
+        const isOpen = container.classList.contains('open');
+        closeAllSelects(container);
+        if (!isOpen) {
+          container.classList.add('open');
+          trigger.setAttribute('aria-expanded', 'true');
+        } else {
+          container.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // 键盘无障碍支持 (Enter / Space)
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          trigger.click();
+        } else if (e.key === 'Escape') {
+          container.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        }
+      });
+
+      // 选项点击事件
+      options.forEach(option => {
+        option.addEventListener('click', function (e) {
+          e.stopPropagation();
+          const val = option.getAttribute('data-value');
+          const text = option.textContent.trim();
+
+          // 更新选中文案与表单值
+          if (valueDisplay) valueDisplay.textContent = text;
+          if (hiddenInput) {
+            hiddenInput.value = val;
+            hiddenInput.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+
+          // 更新高亮样式
+          options.forEach(opt => {
+            opt.classList.remove('selected');
+            opt.setAttribute('aria-selected', 'false');
+          });
+          option.classList.add('selected');
+          option.setAttribute('aria-selected', 'true');
+
+          // 收回下拉框并将指示箭头旋转复位
+          container.classList.remove('open');
+          trigger.setAttribute('aria-expanded', 'false');
+        });
+      });
+    });
+
+    // 点击组件外部收回并复位
+    document.addEventListener('click', function () {
+      closeAllSelects();
+    });
+
+    // ESC 键收回
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') {
+        closeAllSelects();
+      }
+    });
+  });
+</script>
+</body></html>

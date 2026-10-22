@@ -1,0 +1,47 @@
+# ===== 依赖 =====
+node_modules/
+**/node_modules/
+
+# ===== 构建产物 =====
+dist/
+dist-ssr/
+*.local.bak*
+
+# ===== 环境变量与密钥（真实值只留在本机） =====
+.env
+.env.*
+!.env.example
+!**/.env.example
+*.local
+*.pem
+*.key
+*.p12
+*.pfx
+# 历史遗留的明文数据库配置
+config.toml
+pg-api/config.toml
+
+# ===== 日志 =====
+*.log
+logs/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ===== 编辑器 / 系统 =====
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== 临时文件 =====
+tmp/
+tmp-raw/
+*.tmp
+*.bak
+*.bak-*
+__screenshots__/
+coverage/
